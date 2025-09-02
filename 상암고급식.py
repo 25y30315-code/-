@@ -22,7 +22,6 @@ plt.rcParams['axes.unicode_minus'] = False
 # ────────────── 한국 시간 ──────────────
 kst = pytz.timezone('Asia/Seoul')
 현재 = datetime.datetime.now(kst)
-오늘 = 현재.strftime("%y%m%d")
 
 # ────────────── 권장 섭취량 ──────────────
 권장량 = {"에너지(kcal)":2000,"탄수화물(g)":324,"단백질(g)":55,"지방(g)":54,"칼슘(mg)":700}
@@ -44,11 +43,16 @@ def get_meal(날짜):
 
 # ────────────── Streamlit UI ──────────────
 st.markdown("<h1 style='text-align:center; color:#FF6F61;'>🍱 상암고 급식 & 영양소 분석</h1>", unsafe_allow_html=True)
-st.markdown(f"<p style='text-align:center; color:#FFB347;'>오늘 날짜: {현재.strftime('%Y-%m-%d')}</p>", unsafe_allow_html=True)
+
+# 날짜 선택 위젯
+선택날짜 = st.date_input("📅 날짜를 선택하세요", 현재.date())
+오늘 = 선택날짜.strftime("%y%m%d")
+
+st.markdown(f"<p style='text-align:center; color:#FFB347;'>선택한 날짜: {선택날짜.strftime('%Y-%m-%d')}</p>", unsafe_allow_html=True)
 
 info = get_meal(오늘)
 if not info:
-    st.error("오늘 급식 정보가 없습니다.")
+    st.error("해당 날짜의 급식 정보가 없습니다.")
 else:
     for row in info:
         meal_name = row['MMEAL_SC_NM']
@@ -116,9 +120,14 @@ if 누적 and count>0:
     st.dataframe(df_avg,use_container_width=True)
 
     fig, ax = plt.subplots()
+    colors = ['#FFB6C1','#FF69B4','#FF7F50','#FFD700','#87CEFA']
     ax.bar(df_avg["영양소"], df_avg["평균값"], color=colors[:len(df_avg)])
     ax.set_title("지난 7일 평균 영양소", color="#FF69B4")
     st.pyplot(fig)
 else:
     st.warning("지난 7일간 영양소 데이터를 불러올 수 없습니다.")
+
+# ────────────── 제작자 표시 ──────────────
+st.markdown("<hr>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; color:gray;'>👩‍💻 제작자: 30315 이나연</p>", unsafe_allow_html=True)
 
