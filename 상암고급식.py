@@ -1,5 +1,3 @@
-import run
-# -*- coding: utf-8 -*-
 import streamlit as st
 import requests
 import datetime
@@ -123,3 +121,4 @@ if 누적 and count>0:
     st.pyplot(fig)
 else:
     st.warning("지난 7일간 영양소 데이터를 불러올 수 없습니다.")
+
