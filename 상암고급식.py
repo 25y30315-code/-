@@ -4,20 +4,7 @@ import datetime
 import pytz
 import re
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
-
-# ────────────── 한글 폰트 ──────────────
-try:
-    font_path = fm.findfont("Malgun Gothic")
-except:
-    try:
-        font_path = fm.findfont("AppleGothic")
-    except:
-        font_path = fm.findfont("NanumGothic")
-font_prop = fm.FontProperties(fname=font_path)
-plt.rc('font', family=font_prop.get_name())
-plt.rcParams['axes.unicode_minus'] = False
+import plotly.express as px
 
 # ────────────── 한국 시간 ──────────────
 kst = pytz.timezone('Asia/Seoul')
@@ -92,12 +79,18 @@ else:
                 st.markdown("✅ **권장량 대비 비율**")
                 st.table(pd.DataFrame(비교, columns=["영양소","급식 제공량","권장량","충족률"]))
 
-            # 그래프
-            fig, ax = plt.subplots()
-            colors = ['#FFB6C1','#FF69B4','#FF7F50','#FFD700','#87CEFA']
-            ax.bar(df["영양소"], df["값"], color=colors[:len(df)])
-            ax.set_title(f"{meal_name} 영양 성분", color="#FF69B4")
-            st.pyplot(fig)
+            # ────────────── Plotly 그래프 ──────────────
+            fig = px.bar(
+                df,
+                x="영양소",
+                y="값",
+                title=f"{meal_name} 영양 성분",
+                color="영양소",
+                text="값",
+                color_discrete_sequence=px.colors.qualitative.Pastel
+            )
+            fig.update_layout(title_font=dict(size=20, color="#FF69B4"))
+            st.plotly_chart(fig, use_container_width=True)
 
 # ────────────── 지난 7일 평균 ──────────────
 st.header("📊 지난 7일 평균 영양소 분석")
@@ -119,15 +112,21 @@ if 누적 and count>0:
     df_avg = pd.DataFrame(list(평균.items()), columns=["영양소","평균값"])
     st.dataframe(df_avg,use_container_width=True)
 
-    fig, ax = plt.subplots()
-    colors = ['#FFB6C1','#FF69B4','#FF7F50','#FFD700','#87CEFA']
-    ax.bar(df_avg["영양소"], df_avg["평균값"], color=colors[:len(df_avg)])
-    ax.set_title("지난 7일 평균 영양소", color="#FF69B4")
-    st.pyplot(fig)
+    # ────────────── Plotly 그래프 ──────────────
+    fig = px.bar(
+        df_avg,
+        x="영양소",
+        y="평균값",
+        title="지난 7일 평균 영양소",
+        color="영양소",
+        text="평균값",
+        color_discrete_sequence=px.colors.qualitative.Pastel
+    )
+    fig.update_layout(title_font=dict(size=20, color="#FF69B4"))
+    st.plotly_chart(fig, use_container_width=True)
 else:
     st.warning("지난 7일간 영양소 데이터를 불러올 수 없습니다.")
 
 # ────────────── 제작자 표시 ──────────────
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("<p style='text-align:center; color:gray;'>👩‍💻 제작자: 30315 이나연</p>", unsafe_allow_html=True)
-
